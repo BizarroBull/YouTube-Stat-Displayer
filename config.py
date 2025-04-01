@@ -1,0 +1,5 @@
+WIFI_SSID = 'ssid'
+WIFI_PASSWORD = 'password'
+YT_CHANNEL = 'channel'
+YT_CHANNEL_ID = 'id'
+YT_API_KEY = 'key'
