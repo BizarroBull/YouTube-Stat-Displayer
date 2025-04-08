@@ -10,10 +10,6 @@ The device will connect to the internet via a WiFi connection.
 Every 60 seconds the device will request your YouTube statistics.
 The result is displayed.
 
-Button A changes between light mode and dark mode<br>
-Button B changes font<br>
-Button X changes brightness<br>
-
 
 ## What You Need
 
@@ -57,9 +53,9 @@ Detailed instructions can be found at https://learn.pimoroni.com/article/getting
 
 The latest version of the custom MicroPython is currently v1.24.0 beta 2.
 
-Edit the custom.py file and enter your channel ID, API key, and WiFi credentials.
+Edit the config.py file and enter your WiFi credentials, channel name, channel ID, and API key.
 
-Upload main.py, config.py, ytlight.png and ytdark.png to the pico using Thonny.
+Upload main.py, config.py, hourglass.png, ytlight.png and ytdark.png to the pico using Thonny.
 
 Power cycle the pico and your YouTube statistics should be displayed.
 

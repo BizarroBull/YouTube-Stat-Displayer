@@ -2,7 +2,7 @@
 
 title1 = "Bull's YouTube"
 title2 = "Stat Displayer"
-version = "v0.1.0"
+version = "v1.0.0"
 
 # import machine
 import time
@@ -35,17 +35,13 @@ def connect():
     waittime = 0
 
     try:
-        # Open our PNG File from flash. In this example we're using an image of a cartoon pencil.
-        # You can use Thonny to transfer PNG Images to your Pico.
+        # Open our PNG File from flash.
         png.open_file("hourglass.png")
-        # png.open_file("yt_icon_rgb.png")
-
-        # Decode our PNG file and set the X and Y
- #       png.decode(300, LINE_1, scale=1, rotate=90)
 
         # Handle the error if the image doesn't exist on the flash.
     except OSError:
         print("Error: PNG File missing. Copy the PNG file from the example folder to your Pico using Thonny and run the example again.")
+
     display.update()
     #Connect to WLAN
     wlan = network.WLAN(network.STA_IF)
@@ -54,23 +50,15 @@ def connect():
     while wlan.isconnected() == False:
         display.text( "Connecting to Wifi", COLUMN_0, LINE_1 )
         display.update()
-        try:
-            # Open our PNG File from flash. In this example we're using an image of a cartoon pencil.
-            # You can use Thonny to transfer PNG Images to your Pico.
-  #          png.open_file("hourglass.png")
-            # png.open_file("yt_icon_rgb.png")
 
-            # Decode our PNG file and set the X and Y
-            display.set_pen(BG)
-            display.rectangle(260, 115, 16, 16)
-            png.decode(260, 115, scale=1, rotate=rotation)
-            rotation += 90
-            if( rotation == 360 ):
-                rotation = 0
+        # Decode our PNG file and set the X and Y
+        display.set_pen(BG)
+        display.rectangle(260, 115, 16, 16)
+        png.decode(260, 115, scale=1, rotate=rotation)
+        rotation += 90
+        if( rotation == 360 ):
+            rotation = 0
 
-            # Handle the error if the image doesn't exist on the flash.
-        except OSError:
-            print("Error: PNG File missing. Copy the PNG file from the example folder to your Pico using Thonny and run the example again.")
         display.update()
         # print('Waiting for connection...')
         time.sleep(1)
@@ -97,8 +85,6 @@ def get_yt_data():
     response = requests.get(url)
     # Get response code
     # response_code = response.status_code
-    # Get response content
-    # response_content = response.content
     # Get response content
     ytstats = response.json()
     # Close the request
@@ -149,9 +135,6 @@ def update_display():
     # Set the backlight so we can see it!
     display.set_backlight(1.0)
 
-    # Create an instance of the PNG Decoder
- #   png = pngdec.PNG(display)
-
     # Create some pens for use later.
     BG = display.create_pen(255, 255, 255)
     TEXT = display.create_pen(0, 0, 0)
@@ -162,7 +145,6 @@ def update_display():
 
     display.set_pen(TEXT)
     display.set_font("bitmap14_outline")
-    #display.text( f'channel'"@antoniodio", 15, 80)
     display.text( f'@{YT_CHANNEL}', COLUMN_0, LINE_0 )
     display.text( f'Subscribers: {subscriberCount}', COLUMN_0, LINE_1 )
     display.text( f'Total Views: {viewCount}', COLUMN_0, LINE_2 )
