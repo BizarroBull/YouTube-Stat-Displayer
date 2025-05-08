@@ -2,13 +2,14 @@
 
 title1 = "Bull's YouTube"
 title2 = "Stat Displayer"
-version = "v1.0.0"
+version = "v1.1.0"
 
 # import machine
 import time
+from machine import Pin
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB332
 import pngdec
-
+from pimoroni import RGBLED
 import network
 import requests
 
@@ -24,13 +25,20 @@ LINE_3 = 170
 subscriberCount = '0'
 viewCount = '0'
 
+button_a = Pin(12, Pin.IN, Pin.PULL_UP)
+button_b = Pin(13, Pin.IN, Pin.PULL_UP)
+button_x = Pin(14, Pin.IN, Pin.PULL_UP)
+button_y = Pin(15, Pin.IN, Pin.PULL_UP)
+
+led = RGBLED(26, 27, 28)
+
 # ------------------------------------------------------------------------------
 
 def connect():
     global display
     global png
-    global BG
-    global TEXT
+    global WHITE
+    global BLACK
     rotation = 0
     waittime = 0
 
@@ -40,7 +48,7 @@ def connect():
 
         # Handle the error if the image doesn't exist on the flash.
     except OSError:
-        print("Error: PNG File missing. Copy the PNG file from the example folder to your Pico using Thonny and run the example again.")
+        print("Error: PNG File missing. Copy the PNG file to your Pico.")
 
     display.update()
     #Connect to WLAN
@@ -68,7 +76,7 @@ def connect():
 
     ip = wlan.ifconfig()[0]
     print(f'Connected on {ip}')
-    display.set_pen(TEXT)
+    display.set_pen(BLACK)
     display.text( f'Connected on', COLUMN_0, LINE_2 )
     display.text( f'{ip}', COLUMN_0, LINE_3 )
     display.update()
@@ -97,28 +105,15 @@ def get_yt_data():
 
 def init_display():
     global display
-    global png
-    global BG
-    global TEXT
-    global title
-
-    # Create a PicoGraphics instance
-    display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, pen_type=PEN_RGB332)
-    # Set the backlight so we can see it!
-    display.set_backlight(1.0)
-
-    # Create an instance of the PNG Decoder
-    png = pngdec.PNG(display)
-
-    # Create some pens for use later.
-    BG = display.create_pen(255, 255, 255)
-    TEXT = display.create_pen(0, 0, 0)
+    global WHITE
+    global BLACK
 
     # Clear the screen
-    display.set_pen(BG)
+
+    display.set_pen(WHITE)
     display.clear()
 
-    display.set_pen(TEXT)
+    display.set_pen(BLACK)
     display.set_font("bitmap14_outline")
     display.text( f"{title1}", 5, 5 )
     display.text( f"{title2}", 5, 35 )
@@ -127,19 +122,30 @@ def init_display():
 
 # ------------------------------------------------------------------------------
 
+def load_logo():
+    global logo
+    try:
+        # Open our PNG File from flash.
+
+        png.open_file( f"{logo}" )
+
+        # Decode our PNG file and set the X and Y
+        png.decode(10, 10, scale=1)
+
+    # Handle the error if the image doesn't exist on the flash.
+    except OSError:
+        print("Error: PNG File missing. Copy the PNG file to your Pico.")
+
+# ------------------------------------------------------------------------------
+
 def update_display():
     global display
     global BG
     global TEXT
-
-    # Set the backlight so we can see it!
-    display.set_backlight(1.0)
-
-    # Create some pens for use later.
-    BG = display.create_pen(255, 255, 255)
-    TEXT = display.create_pen(0, 0, 0)
+    global png
 
     # Clear the screen
+
     display.set_pen(BG)
     display.clear()
 
@@ -149,32 +155,79 @@ def update_display():
     display.text( f'Subscribers: {subscriberCount}', COLUMN_0, LINE_1 )
     display.text( f'Total Views: {viewCount}', COLUMN_0, LINE_2 )
 
-    try:
-        # Open our PNG File from flash. In this example we're using an image of a cartoon pencil.
-        # You can use Thonny to transfer PNG Images to your Pico.
-        png.open_file("ytlight.png")
-        # png.open_file("yt_icon_rgb.png")
+    # Decode our PNG file and set the X and Y
 
-        # Decode our PNG file and set the X and Y
-        png.decode(10, 10, scale=1)
-
-    # Handle the error if the image doesn't exist on the flash.
-    except OSError:
-        print("Error: PNG File missing. Copy the PNG file from the example folder to your Pico using Thonny and run the example again.")
+    png.decode(10, 10, scale=1)
 
     display.update()
 
 # ------------------------------------------------------------------------------
 
+# Create a PicoGraphics instance
+
+display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, pen_type=PEN_RGB332)
+
+# Create an instance of the PNG Decoder
+
+png = pngdec.PNG(display)
+
+# Set the backlight so we can see it.
+
+display.set_backlight(1.0)
+
+# Create some pens.
+
+WHITE = display.create_pen(255, 255, 255)
+BLACK = display.create_pen(0, 0, 0)
+
+# Turn off the RGB LED
+
+led.set_rgb(0, 0, 0)
+
+BG = WHITE
+TEXT = BLACK
+countdowntimer = 0
 init_display()
 connect()
+logo = "ytlight.png"
+load_logo()
 
 while True:
-    # Get updated YouTube data and update the display.
 
-    get_yt_data()
-    update_display();
+    if countdowntimer == 0:
+        # One minute has passed.
 
-    # Sleep for 60 seconds.
+        countdowntimer = 600;
 
-    time.sleep(60)
+        # Get updated YouTube data and update the display.
+
+        get_yt_data()
+        update_display();
+
+    elif button_a.value() == 0:
+        # Button A was pressed.
+        # White background, black text.
+
+        BG = WHITE
+        TEXT = BLACK
+        logo = "ytlight.png"
+        load_logo()
+        update_display();
+
+    elif button_b.value() == 0:
+        # Button B was pressed.
+        # Black background, white text.
+
+        BG = BLACK
+        TEXT = WHITE
+        logo = "ytdark.png"
+        load_logo()
+        update_display();
+
+
+    # Sleep for 100ms then check buttons again.
+    time.sleep(0.1)
+
+    # Decrement our countdown timer.
+
+    countdowntimer = countdowntimer - 1

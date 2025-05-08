@@ -8,7 +8,9 @@ A device to display statistics for your YouTube channel.
 
 The device will connect to the internet via a WiFi connection.
 Every 60 seconds the device will request your YouTube statistics.
-The result is displayed.
+The result is displayed.<br>
+Press the A button for light mode.<br>
+Press the B button for dark mode.<br>
 
 
 ## What You Need
@@ -37,6 +39,17 @@ Note: You must be signed in as the channel's primary owner to see this info.
 3. If the APIs & services page isn't already open, open the left side menu and select APIs & services.
 4. On the left, choose Credentials.
 5. Click Create credentials and then select API key.
+
+
+## Enable YouTube v3 api
+
+1. Go to the API Console. https://console.developers.google.com/
+2. From the projects list, select your project that you created the API key for.
+3. If the APIs & services page isn't already open, open the left side menu and select APIs & services.
+4. On the left, choose Enabled APIs & services.
+5. Click Enable APIs and services.
+6. Click YouTube Data API v3
+7. Click Enable.
 
 
 ## Testing your channel ID and API key
